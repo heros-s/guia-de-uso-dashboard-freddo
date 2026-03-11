@@ -1,0 +1,2282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia Interativo — Dashboard Financeiro Freddo Gelateria</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 30px 0;
+            box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0d9488;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin: 0;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            padding: 15px 25px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: rgba(13, 148, 136, 0.1);
+            color: #0d9488;
+            border-left-color: #0d9488;
+        }
+
+        .sidebar-nav a.active {
+            background-color: rgba(13, 148, 136, 0.2);
+            color: #0d9488;
+            border-left-color: #0d9488;
+            font-weight: 600;
+        }
+
+        /* Main content */
+        .main {
+            margin-left: 280px;
+            flex: 1;
+            overflow-y: auto;
+            background-color: #f5f5f5;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: #0d9488;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Section */
+        section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content {
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h2 {
+            color: #1a1a2e;
+            font-size: 32px;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #0d9488;
+            padding-bottom: 15px;
+        }
+
+        h3 {
+            color: #16213e;
+            font-size: 22px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .intro-box {
+            background: white;
+            border-left: 5px solid #0d9488;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .intro-box h3 {
+            margin-top: 0;
+            color: #0d9488;
+        }
+
+        .flow-diagram {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .flow-step {
+            display: inline-block;
+            background: #0d9488;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 5px;
+            margin: 10px;
+            font-weight: 600;
+        }
+
+        .flow-arrow {
+            display: inline-block;
+            color: #0d9488;
+            font-size: 24px;
+            margin: 0 10px;
+        }
+
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-left: 5px solid #0d9488;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h4 {
+            color: #1a1a2e;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .card p {
+            color: #666;
+            margin-bottom: 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .card-value {
+            color: #0d9488;
+            font-weight: 700;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        .card-category {
+            display: inline-block;
+            background: #e0f2f1;
+            color: #00695c;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Selector section */
+        .selector-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .selector-group {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .selector-group label {
+            display: block;
+            color: #1a1a2e;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .selector-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #333;
+            background-color: white;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .selector-group select:focus {
+            outline: none;
+            border-color: #0d9488;
+            box-shadow: 0 0 5px rgba(13, 148, 136, 0.2);
+        }
+
+        /* Chart container */
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: relative;
+            height: 400px;
+        }
+
+        .chart-container.large {
+            height: 500px;
+        }
+
+        /* Funnel diagram */
+        .funnel-wrapper {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .funnel-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .funnel-stage {
+            background: linear-gradient(90deg, #0d9488, #0f766e);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .funnel-stage:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(13, 148, 136, 0.3);
+        }
+
+        .funnel-stage-title {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .funnel-stage-value {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .funnel-stage-description {
+            font-size: 12px;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
+
+        .funnel-stage:nth-child(1) { width: 100%; background: linear-gradient(90deg, #0d9488, #0f766e); }
+        .funnel-stage:nth-child(2) { width: 90%; background: linear-gradient(90deg, #0891b2, #0e7490); margin: 0 auto; }
+        .funnel-stage:nth-child(3) { width: 75%; background: linear-gradient(90deg, #06b6d4, #0891b2); margin: 0 auto; }
+        .funnel-stage:nth-child(4) { width: 60%; background: linear-gradient(90deg, #8b5cf6, #7c3aed); margin: 0 auto; }
+        .funnel-stage:nth-child(5) { width: 40%; background: linear-gradient(90deg, #ec4899, #db2777); margin: 0 auto; }
+
+        /* Alert cards */
+        .alert-card {
+            background: white;
+            border-left: 5px solid #f59e0b;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .alert-card.danger {
+            border-left-color: #ef4444;
+        }
+
+        .alert-card.warning {
+            border-left-color: #f59e0b;
+        }
+
+        .alert-card.info {
+            border-left-color: #3b82f6;
+        }
+
+        .alert-icon {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #f59e0b;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .alert-card.danger .alert-icon {
+            background: #ef4444;
+        }
+
+        .alert-card.info .alert-icon {
+            background: #3b82f6;
+        }
+
+        .alert-content {
+            display: inline-block;
+            vertical-align: top;
+        }
+
+        .alert-content h4 {
+            color: #1a1a2e;
+            margin-bottom: 5px;
+        }
+
+        .alert-content p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* Step list */
+        .step-list {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .step {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            background: #0d9488;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            color: #1a1a2e;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .step-content p {
+            color: #666;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* Data table */
+        .table-responsive {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .num {
+            text-align: right;
+            font-family: 'Monaco', 'Courier New', monospace;
+            color: #0d9488;
+            font-weight: 600;
+        }
+
+        /* Formula cards */
+        .formula-card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #0d9488;
+            transition: all 0.3s ease;
+        }
+
+        .formula-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .formula-card h4 {
+            color: #1a1a2e;
+            font-size: 17px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .formula-card h4 .badge {
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-receita { background: #d1fae5; color: #065f46; }
+        .badge-custo { background: #fee2e2; color: #991b1b; }
+        .badge-resultado { background: #dbeafe; color: #1e40af; }
+        .badge-margem { background: #fef3c7; color: #92400e; }
+        .badge-avancado { background: #ede9fe; color: #5b21b6; }
+
+        .formula-box {
+            background: #1a1a2e;
+            color: #e2e8f0;
+            padding: 16px 20px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Menlo', 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            margin: 12px 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .formula-box .kw { color: #7dd3fc; font-weight: 600; }
+        .formula-box .fn { color: #c084fc; }
+        .formula-box .col { color: #86efac; }
+        .formula-box .tbl { color: #fcd34d; }
+        .formula-box .op { color: #f87171; }
+        .formula-box .num { color: #fb923c; font-family: inherit; text-align: left; }
+        .formula-box .comment { color: #6b7280; font-style: italic; }
+
+        .formula-label {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 10px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .formula-explain {
+            margin-top: 12px;
+            padding: 14px 18px;
+            background: #f0fdfa;
+            border-radius: 6px;
+            border: 1px solid #ccfbf1;
+        }
+
+        .formula-explain p {
+            margin: 0 0 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .formula-explain p:last-child { margin-bottom: 0; }
+
+        .formula-explain .source-label {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #0d9488;
+            margin-right: 6px;
+        }
+
+        .formula-explain .source-col {
+            display: inline-block;
+            background: #e2e8f0;
+            padding: 1px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            color: #334155;
+            margin: 2px 3px;
+        }
+
+        .formula-group-title {
+            font-size: 20px;
+            color: #1a1a2e;
+            margin: 35px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #0d9488;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .formula-group-title:first-of-type {
+            margin-top: 20px;
+        }
+
+        .validation-note {
+            background: linear-gradient(135deg, #fef3c7 0%, #fff7ed 100%);
+            border: 1px solid #fbbf24;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin: 20px 0 30px;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .validation-note strong {
+            color: #92400e;
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a1a2e;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            margin-top: 40px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+            }
+
+            .main {
+                margin-left: 250px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .funnel-stage:nth-child(1) { width: 100%; }
+            .funnel-stage:nth-child(2) { width: 85%; }
+            .funnel-stage:nth-child(3) { width: 70%; }
+            .funnel-stage:nth-child(4) { width: 55%; }
+            .funnel-stage:nth-child(5) { width: 35%; }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            .flow-step, .flow-arrow {
+                display: block;
+                margin: 10px 0;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Dashboard</div>
+                <div class="sidebar-subtitle">Guia Interativo</div>
+            </div>
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="#boas-vindas" class="nav-link active">Boas-vindas</a></li>
+                    <li><a href="#visao-geral" class="nav-link">Visão Geral</a></li>
+                    <li><a href="#painel-geral" class="nav-link">Página 1 — Painel Geral</a></li>
+                    <li><a href="#funil-financeiro" class="nav-link">Página 2 — Funil Financeiro</a></li>
+                    <li><a href="#glossario" class="nav-link">Glossário de Indicadores</a></li>
+                    <li><a href="#formulas" class="nav-link">Fórmulas e Validação</a></li>
+                    <li><a href="#analise-mensal" class="nav-link">Como Analisar</a></li>
+                    <li><a href="#alertas" class="nav-link">Sinais de Atenção</a></li>
+                    <li><a href="#dados-2025" class="nav-link">Dados Reais 2025</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Header -->
+            <div class="header">
+                <h1>Guia Interativo — Dashboard Financeiro Freddo Gelateria</h1>
+                <p>Domine a análise financeira e tome decisões baseadas em dados reais do seu ERP</p>
+            </div>
+
+            <!-- Section 1: Boas-vindas -->
+            <section id="boas-vindas" class="active">
+                <div class="content">
+                    <h2>Bem-vinda! 🎯</h2>
+
+                    <div class="intro-box">
+                        <h3>O que você vai aprender</h3>
+                        <p>Este guia foi desenvolvido especialmente para ajudá-la a dominar o uso do dashboard "Acompanhamento Financeiro" da Freddo Gelateria. Você aprenderá a:</p>
+                        <ul style="margin-left: 20px; margin-bottom: 15px;">
+                            <li><strong>Eliminar cálculos manuais</strong> — todos os números já estão processados e visualizados</li>
+                            <li><strong>Acompanhar resultados com agilidade</strong> — veja o desempenho do negócio em tempo real</li>
+                            <li><strong>Tomar decisões baseadas em dados</strong> — use números concretos do seu ERP para estratégia</li>
+                            <li><strong>Identificar pontos críticos</strong> — saiba onde o dinheiro está sendo investido ou desperdiçado</li>
+                        </ul>
+                    </div>
+
+                    <h3>Objetivo do Dashboard</h3>
+                    <p>O dashboard "Acompanhamento Financeiro" foi criado para transformar os dados brutos do seu ERP em <strong>insights visuais e actionáveis</strong>. Em vez de perder tempo com planilhas, você terá um painel executivo que mostra:</p>
+                    <ul style="margin-left: 20px; margin-bottom: 15px;">
+                        <li>Receita bruta e líquida do mês</li>
+                        <li>Todas as margens importantes (bruta, operacional, líquida)</li>
+                        <li>Indicadores de custo (CMV, folha de pagamento, operacional)</li>
+                        <li>Fluxo de caixa e EBITDA</li>
+                        <li>Comparações mês a mês para identificar tendências</li>
+                    </ul>
+
+                    <h3>Como usar este guia</h3>
+                    <p>Use o <strong>menu à esquerda</strong> para navegar entre os tópicos. Cada seção contém explicações, exemplos práticos e dados reais da Freddo Gelateria para que você entenda exatamente como interpretar o dashboard durante a reunião virtual.</p>
+                </div>
+            </section>
+
+            <!-- Section 2: Visão Geral -->
+            <section id="visao-geral">
+                <div class="content">
+                    <h2>Visão Geral do Dashboard</h2>
+
+                    <h3>Estrutura e Páginas</h3>
+                    <p>O dashboard "Acompanhamento Financeiro" é composto por <strong>2 páginas principais</strong>:</p>
+
+                    <div class="card-grid">
+                        <div class="card">
+                            <h4>📊 Página 1 — Painel Geral</h4>
+                            <p>Visão executiva com:</p>
+                            <ul style="margin-left: 15px; font-size: 14px;">
+                                <li>Cards de KPI (Receita, Margens, Custos)</li>
+                                <li>Seletores interativos para explorar indicadores</li>
+                                <li>Gráficos mensais dinâmicos</li>
+                                <li>Comparações MoM (mês a mês)</li>
+                            </ul>
+                        </div>
+                        <div class="card">
+                            <h4>🔗 Página 2 — Funil Financeiro</h4>
+                            <p>Análise do fluxo de caixa:</p>
+                            <ul style="margin-left: 15px; font-size: 14px;">
+                                <li>Visualização do caminho do dinheiro</li>
+                                <li>Receita → Lucro → Caixa</li>
+                                <li>Identificação de onde o dinheiro sai</li>
+                                <li>Cash conversion e FCLA</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Fluxo de Dados: Do ERP ao Dashboard</h3>
+                    <div class="flow-diagram">
+                        <div class="flow-step">ERP</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Extração de Dados</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Power BI</div>
+                        <div class="flow-arrow">→</div>
+                        <div class="flow-step">Decisões</div>
+                    </div>
+                    <p style="text-align: center; margin-top: 15px; color: #666;">Os dados do ERP são extraídos automaticamente, processados em Power BI e apresentados em um formato visual que facilita a análise.</p>
+
+                    <h3>O que é Power BI?</h3>
+                    <p>Power BI é uma ferramenta de <strong>business intelligence</strong> que transforma dados brutos em visualizações interativas. Com ela, você pode:</p>
+                    <ul style="margin-left: 20px; margin-bottom: 15px;">
+                        <li><strong>Explorar dados</strong> — clique e arraste para filtrar informações</li>
+                        <li><strong>Visualizar trends</strong> — veja graficamente como seus números evoluem</li>
+                        <li><strong>Tomar decisões rápidas</strong> — não precisa mais de planilhas complexas</li>
+                        <li><strong>Compartilhar insights</strong> — exporte relatórios e apresente para a equipe</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Section 3: Painel Geral -->
+            <section id="painel-geral">
+                <div class="content">
+                    <h2>Página 1 — Painel Geral</h2>
+
+                    <h3>Cards de KPI</h3>
+                    <p>A primeira coisa que você verá ao abrir o dashboard são os <strong>Cards de KPI</strong> (Key Performance Indicators). Esses são os números mais importantes do negócio:</p>
+
+                    <div class="card-grid">
+                        <div class="card">
+                            <h4>💰 Receita Bruta</h4>
+                            <p>Faturamento total antes de qualquer dedução. É o teto do seu negócio.</p>
+                            <div class="card-value">R$ 45.483.041</div>
+                            <span class="card-category">Anual 2025</span>
+                        </div>
+                        <div class="card">
+                            <h4>📈 Receita Líquida</h4>
+                            <p>Receita após descontos, impostos e devoluções. O que realmente entra.</p>
+                            <div class="card-value">R$ 34.900.525</div>
+                            <span class="card-category">Anual 2025</span>
+                        </div>
+                        <div class="card">
+                            <h4>📊 Variação MoM</h4>
+                            <p>Comparação com o mês anterior. Identifica crescimento ou queda.</p>
+                            <div class="card-value">+3.2%</div>
+                            <span class="card-category">Dezembro/2025</span>
+                        </div>
+                    </div>
+
+                    <h3>Seletores Interativos</h3>
+                    <p>O Power BI permite que você explore dados usando <strong>seletores (dropdowns)</strong>. Aqui estão os principais:</p>
+
+                    <h4>1. Seletor de Indicador (18 opções)</h4>
+                    <p>Escolha qual métrica você quer visualizar em gráfico:</p>
+                    <div class="selector-grid">
+                        <div class="selector-group">
+                            <label>Selecione um Indicador:</label>
+                            <select id="indicador-selector">
+                                <option value="receita-liquida">Receita Líquida</option>
+                                <option value="despesas">Despesas</option>
+                                <option value="marg-bruta">% Margem Bruta</option>
+                                <option value="marg-liquida">% Margem Líquida</option>
+                                <option value="marg-operacional">% Margem Operacional</option>
+                                <option value="peso-folha">% Peso da Folha</option>
+                                <option value="peso-cmv">% Peso CMV</option>
+                                <option value="ebitda">% EBITDA</option>
+                                <option value="var-receita">% Var. Receita/Mês</option>
+                                <option value="cmv">CMV</option>
+                                <option value="pessoal">Despesas com Pessoal</option>
+                                <option value="operacional">Despesas Operacionais</option>
+                                <option value="devolucoes">Devoluções</option>
+                                <option value="investimentos">Investimentos</option>
+                                <option value="lucro-liquido">Lucro Líquido</option>
+                                <option value="fcla">FCLA</option>
+                                <option value="receita-bruta">Receita Bruta</option>
+                                <option value="conversao">Conversão de Fluxo de Caixa</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h4>2. Seletor de Margem (8 opções)</h4>
+                    <p>Analise as diferentes margens do seu negócio:</p>
+                    <div class="selector-grid">
+                        <div class="selector-group">
+                            <label>Selecione uma Margem:</label>
+                            <select id="margem-selector">
+                                <option value="margem-bruta">% Margem Bruta</option>
+                                <option value="contribuicao">Contribuição</option>
+                                <option value="margem-liquida">Margem Líquida</option>
+                                <option value="margem-operacional">Margem Operacional</option>
+                                <option value="peso-cmv">Peso CMV</option>
+                                <option value="peso-folha">Peso Folha</option>
+                                <option value="ebitda">EBITDA</option>
+                                <option value="fcla">FCLA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h4>3. Seletor de Receita (4 opções)</h4>
+                    <p>Compare diferentes tipos de receita:</p>
+                    <div class="selector-grid">
+                        <div class="selector-group">
+                            <label>Selecione a Receita:</label>
+                            <select id="receita-selector">
+                                <option value="receita-liquida">Receita Líquida</option>
+                                <option value="receita-bruta">Receita Bruta</option>
+                                <option value="ebitda">EBITDA</option>
+                                <option value="fcla">FCLA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h3>Exemplo de Gráfico: Receita Líquida Mensal</h3>
+                    <p>Aqui está como os dados aparecem em um gráfico interativo no dashboard:</p>
+                    <div class="chart-container">
+                        <canvas id="chart-receita-mensal"></canvas>
+                    </div>
+
+                    <h3>Como Usar os Seletores</h3>
+                    <div class="step-list">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Abra o Painel Geral</h4>
+                                <p>Você verá os KPIs e os seletores no topo da página</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Escolha um indicador</h4>
+                                <p>Clique no seletor "Indicador" e escolha qual métrica quer visualizar</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Observe o gráfico</h4>
+                                <p>O Power BI atualiza automaticamente e mostra o dados mensais</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Hover para mais informações</h4>
+                                <p>Passe o mouse sobre o gráfico para ver valores exatos</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Funil Financeiro -->
+            <section id="funil-financeiro">
+                <div class="content">
+                    <h2>Página 2 — Funil Financeiro</h2>
+
+                    <h3>O que é o Funil Financeiro?</h3>
+                    <p>O Funil Financeiro mostra o caminho do dinheiro no seu negócio. Começamos com a <strong>Receita Líquida</strong> (100% do faturamento) e acompanhamos para onde ele vai até chegar ao <strong>FCLA</strong> (o dinheiro que realmente fica com você).</p>
+
+                    <div class="intro-box">
+                        <h3>Por que é chamado "Funil"?</h3>
+                        <p>Porque a quantidade de dinheiro "encolhe" conforme você desce pelos passos. Você comça com toda a receita, mas vai pagando custos (CMV, folha, impostos, juros, etc.) até sobrar apenas o lucro líquido e o fluxo de caixa.</p>
+                    </div>
+
+                    <h3>Os 5 Estágios do Funil</h3>
+                    <div class="funnel-wrapper">
+                        <div class="funnel-container">
+                            <div class="funnel-stage">
+                                <div class="funnel-stage-title">1️⃣ Receita Líquida</div>
+                                <div class="funnel-stage-value">R$ 34.900.525</div>
+                                <div class="funnel-stage-description">100% do faturamento após deduções</div>
+                            </div>
+                            <div class="funnel-stage">
+                                <div class="funnel-stage-title">2️⃣ Lucro Bruto</div>
+                                <div class="funnel-stage-value">R$ 19.923.233</div>
+                                <div class="funnel-stage-description">Receita menos Custo da Matéria-Prima (CMV)</div>
+                            </div>
+                            <div class="funnel-stage">
+                                <div class="funnel-stage-title">3️⃣ EBITDA</div>
+                                <div class="funnel-stage-value">R$ 8.531.126</div>
+                                <div class="funnel-stage-description">Resultado operacional antes de juros, impostos, depreciação</div>
+                            </div>
+                            <div class="funnel-stage">
+                                <div class="funnel-stage-title">4️⃣ Lucro Líquido</div>
+                                <div class="funnel-stage-value">R$ 3.203.484</div>
+                                <div class="funnel-stage-description">Lucro final após todos os custos e impostos</div>
+                            </div>
+                            <div class="funnel-stage">
+                                <div class="funnel-stage-title">5️⃣ FCLA</div>
+                                <div class="funnel-stage-value">R$ 499.270</div>
+                                <div class="funnel-stage-description">Fluxo de Caixa Livre para Acionista — dinheiro real</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Entendendo cada estágio</h3>
+
+                    <div class="card-grid">
+                        <div class="card">
+                            <h4>Receita Líquida</h4>
+                            <p>O ponto de partida. É o dinheiro que entra depois de descontar impostos, devoluções e promoções. Exemplo: Você fatura R$ 40M, mas desconta R$ 5M em impostos = R$ 35M de receita líquida.</p>
+                        </div>
+                        <div class="card">
+                            <h4>Lucro Bruto</h4>
+                            <p>Receita Líquida menos o custo da matéria-prima (CMV). Se sua receita é R$ 35M e você gasta R$ 15M em sorvete, iogurte, cobertura, então lucro bruto = R$ 20M.</p>
+                        </div>
+                        <div class="card">
+                            <h4>EBITDA</h4>
+                            <p>Lucro operacional. É o dinheiro que sobra depois de pagar matéria-prima, folha de pessoal e custos operacionais (água, energia, aluguel). Mostra a saúde operacional real.</p>
+                        </div>
+                        <div class="card">
+                            <h4>Lucro Líquido</h4>
+                            <p>O resultado final no papel. Depois de descontar juros de financiamentos, impostos sobre lucro e depreciação. É o lucro contábil que aparece no seu balanço.</p>
+                        </div>
+                        <div class="card">
+                            <h4>FCLA</h4>
+                            <p>O dinheiro que realmente sobra e pode ser distribuído. Diferente do lucro líquido porque descontas investimentos em equipamentos, pagamento de dívidas, etc. É o número que mais importa.</p>
+                        </div>
+                    </div>
+
+                    <h3>Visualização: Funil com Dados 2025</h3>
+                    <p>Veja como o dinheiro "encolhe" ao longo do ano:</p>
+                    <div class="chart-container large">
+                        <canvas id="chart-funil"></canvas>
+                    </div>
+
+                    <h3>Análise do Funil: Perguntas Importantes</h3>
+                    <div class="step-list">
+                        <div class="step">
+                            <div class="step-number">?</div>
+                            <div class="step-content">
+                                <h4>Meu lucro bruto está bom?</h4>
+                                <p>Você quer que seja > 55% da receita líquida. Para a Freddo, está em média 57% — ótimo!</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">?</div>
+                            <div class="step-content">
+                                <h4>Meu EBITDA é saudável?</h4>
+                                <p>Você quer > 20% da receita. Para a Freddo, está em 24% — excelente, mostra que operação é eficiente.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">?</div>
+                            <div class="step-content">
+                                <h4>Por que meu FCLA é tão menor que o lucro líquido?</h4>
+                                <p>Porque você está investindo em equipamentos, pagando dívidas ou realizando compras de capital. É normal em empresas em crescimento.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">?</div>
+                            <div class="step-content">
+                                <h4>E se o FCLA virar negativo?</h4>
+                                <p>Significa que apesar do lucro no papel, o dinheiro está saindo mais do que entrando. Precisa rever investimentos ou buscar financiamento.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Glossário -->
+            <section id="glossario">
+                <div class="content">
+                    <h2>Glossário de Indicadores</h2>
+
+                    <p>Aqui você encontra a definição de todos os indicadores que aparecem no dashboard. Use como referência quando tiver dúvidas sobre o que significa cada número.</p>
+
+                    <h3>Receitas</h3>
+                    <div class="card-grid">
+                        <div class="card">
+                            <h4>Receita Bruta</h4>
+                            <p>Faturamento total antes de qualquer dedução. É o número "teto" do seu negócio — quanto você vende antes de qualquer custo.</p>
+                            <div class="card-category">Importante</div>
+                        </div>
+                        <div class="card">
+                            <h4>Receita Líquida</h4>
+                            <p>Receita após deduções legais (impostos, descontos, devoluções). É o dinheiro que realmente entra no caixa.</p>
+                            <div class="card-category">Crítico</div>
+                        </div>
+                        <div class="card">
+                            <h4>Receita YTD</h4>
+                            <p>"Year to Date" — receita bruta acumulada desde o início do ano até o mês atual. Mostra a performance anual.</p>
+                            <div class="card-category">Tendência</div>
+                        </div>
+                    </div>
+
+                    <h3>Resultados</h3>
+                    <div class="card-grid">
+                        <div class="card">
+                            <h4>Lucro Bruto</h4>
+                            <p><strong>Receita Líquida − CMV</strong></p>
+                            <p>Quanto sobra depois de pagar a matéria-prima. Exemplo: Receita R$ 100 − CMV R$ 40 = Lucro Bruto R$ 60.</p>
+                            <div class="card-category">Resultado</div>
+                        </div>
+                        <div class="card">
+                            <h4>EBITDA</h4>
+                            <p>Resultado operacional antes de juros, impostos, depreciação e amortização.</p>
+                            <p>Mostra se sua operação central é rentável, independente da estrutura financeira ou fiscal.</p>
+                            <div class="card-category">Resultado</div>
+                        </div>
+                        <div class="card">
+                            <h4>Lucro Líquido</h4>
+                            <p>Resultado final após todos os custos, impostos e despesas financeiras.</p>
+                            <p>É o número que aparece no seu balanço contábil e pode ser distribuído aos sócios.</p>
+                            <div class="card-category">Resultado</div>
+                        </div>
+                        <div class="card">
+                            <h4>FCLA</h4>
+                            <p><strong>Fluxo de Caixa Livre para Acionista</strong> — dinheiro real disponível para o sócio após todos os pagamentos e investimentos.</p>
+                            <p>Diferente do lucro líquido porque descontas CapEx, amortização de dívidas e outras saídas de caixa.</p>
+                            <div class="card-category">Crítico</div>
+                        </div>
+                    </div>
+
+                    <h3>Margens (com Referências de Saúde)</h3>
+                    <p>Margens são percentuais que mostram a eficiência do negócio. Aqui estão as referências para o setor de food service:</p>
+
+                    <div class="card-grid">
+                        <div class="card">
+                            <h4>% Margem Bruta</h4>
+                            <p><strong>Lucro Bruto / Receita Líquida</strong></p>
+                            <p>Mostra quanto você lucra só com o produto, antes de custos operacionais.</p>
+                            <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;"><strong>Saudável: > 55%</strong> | Crítico: < 40%</p>
+                            <div class="card-category">Operacional</div>
+                        </div>
+                        <div class="card">
+                            <h4>% Margem de Contribuição</h4>
+                            <p>Percentual de cada venda que contribui para cobrir custos fixos e gerar lucro.</p>
+                            <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;"><strong>Saudável: > 40%</strong> | Crítico: < 30%</p>
+                            <div class="card-category">Operacional</div>
+                        </div>
+                        <div class="card">
+                            <h4>% Margem Operacional (EBITDA)</h4>
+                            <p><strong>EBITDA / Receita Líquida</strong></p>
+                            <p>Quanto da venda vira resultado operacional. Mede a eficiência total da operação.</p>
+                            <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;"><strong>Saudável: > 20%</strong> | Crítico: < 10%</p>
+                            <div class="card-category">Operacional</div>
+                        </div>
+                        <div class="card">
+                            <h4>% Margem Líquida</h4>
+                            <p><strong>Lucro Líquido / Receita Líquida</strong></p>
+                            <p>Quanto realmente sobra após todos os custos. O resultado final no papel.</p>
+                            <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;"><strong>Saudável: > 8%</strong> | Crítico: < 2%</p>
+                            <div class="card-category">Resultado</div>
+                        </div>
+                        <div class="card">
+                            <h4>% Peso CMV</h4>
+                            <p><strong>CMV / Receita Líquida</strong></p>
+                            <p>Quanto de cada real de venda vai para matéria-prima. Quanto menor, melhor.</p>
+                            <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;"><strong>Saudável: < 40%</strong> | Crítico: > 50%</p>
+                            <div class="card-category">Custo</div>
+                        </div>
+                        <div class="card">
+                            <h4>% Peso da Folha</h4>
+                            <p><strong>Despesas com Pessoal / Receita Líquida</strong></p>
+                            <p>Quanto você gasta com salários, encargos e benefícios. Essencial em food service.</p>
+                            <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;"><strong>Saudável: < 25%</strong> | Crítico: > 35%</p>
+                            <div class="card-category">Custo</div>
+                        </div>
+                        <div class="card">
+                            <h4>Cash Conversion</h4>
+                            <p><strong>FCLA / EBITDA</strong></p>
+                            <p>Percentual do EBITDA que vira caixa livre. Mostra se o lucro operacional está virando dinheiro de verdade.</p>
+                            <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;"><strong>Saudável: > 50%</strong> | Crítico: < 20%</p>
+                            <div class="card-category">Caixa</div>
+                        </div>
+                    </div>
+
+                    <h3>Indicadores Avançados</h3>
+                    <div class="card-grid">
+                        <div class="card">
+                            <h4>Break-Even Point</h4>
+                            <p>Receita mínima necessária para cobrir todos os custos fixos (aluguel, salários, etc.). Abaixo disso, você tem prejuízo.</p>
+                            <p>Se seu break-even é R$ 2.000/dia e você está faturando R$ 3.000/dia, você tem 33% de margem de segurança.</p>
+                            <div class="card-category">Planejamento</div>
+                        </div>
+                        <div class="card">
+                            <h4>Crescimento MoM</h4>
+                            <p><strong>Variação Mês a Mês</strong> — percentual de crescimento ou queda da receita comparado com o mês anterior.</p>
+                            <p>Exemplo: Jan = R$ 3,5M, Fev = R$ 3,9M → Crescimento MoM = +11%</p>
+                            <div class="card-category">Tendência</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Fórmulas e Validação -->
+            <section id="formulas">
+                <div class="content">
+                    <h2>Fórmulas e Validação dos Cálculos</h2>
+
+                    <p>Esta seção detalha <strong>exatamente</strong> como cada medida do dashboard é calculada, quais colunas do ERP alimentam cada fórmula, e o que cada resultado representa. Use para validar se os dados e a lógica estão corretos.</p>
+
+                    <div class="validation-note">
+                        <strong>Como validar:</strong> Para cada medida abaixo, você verá a fórmula exata usada no Power BI (em linguagem DAX), seguida de uma explicação em português de quais colunas do ERP são usadas e como o cálculo funciona. Compare com seus dados no ERP para confirmar que os resultados batem. Se algum dado de origem estiver errado ou faltando, o resultado da medida será impactado.
+                    </div>
+
+                    <!-- RECEITAS -->
+                    <h3 class="formula-group-title">Receitas</h3>
+
+                    <div class="formula-card">
+                        <h4>Total Receita Bruta <span class="badge badge-receita">Receita</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Receita Bruta</span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dado de origem:</span> Coluna <span class="source-col">Receita Bruta</span> da tabela Base Comercial</p>
+                            <p>Soma simples de todo o faturamento bruto mensal exportado do ERP. Inclui todas as vendas antes de qualquer desconto, imposto ou devolução.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Total Receita Líquida <span class="badge badge-receita">Receita</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Receita Líquida</span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dado de origem:</span> Coluna <span class="source-col">Receita Líquida</span> da tabela Base Comercial</p>
+                            <p>Soma da receita líquida mensal. No ERP, este valor já é calculado como: Receita Bruta − Deduções (impostos sobre venda, descontos, devoluções, taxas).</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Receita Bruta Atual (mês mais recente) <span class="badge badge-receita">Receita</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">CALCULATE</span>(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Receita Bruta</span>] ),<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">LASTDATE</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">MÊS</span>] )<br>
+                            )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dados de origem:</span> <span class="source-col">Receita Bruta</span> + <span class="source-col">MÊS</span></p>
+                            <p>Pega a Receita Bruta apenas do <strong>último mês disponível</strong> no filtro de datas. LASTDATE encontra automaticamente o mês mais recente. Usado nos cards de KPI para mostrar o valor "atual".</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Receita Líquida Atual (mês mais recente) <span class="badge badge-receita">Receita</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">CALCULATE</span>(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Receita Líquida</span>] ),<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">LASTDATE</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">MÊS</span>] )<br>
+                            )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dados de origem:</span> <span class="source-col">Receita Líquida</span> + <span class="source-col">MÊS</span></p>
+                            <p>Mesma lógica: Receita Líquida do mês mais recente. Se o filtro está em "2025", mostra o valor de Dezembro/25.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Receita YTD (acumulada no ano) <span class="badge badge-receita">Receita</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">TOTALYTD</span>(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Receita Bruta</span>] ),<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="tbl">'Base Comercial'</span>[<span class="col">MÊS</span>]<br>
+                            )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dados de origem:</span> <span class="source-col">Receita Bruta</span> + <span class="source-col">MÊS</span></p>
+                            <p>Acumula a Receita Bruta desde Janeiro até o mês selecionado. Exemplo: se estiver em Março, soma Jan + Fev + Mar. "YTD" = Year to Date (acumulado no ano).</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Deduções (invertido para gráficos) <span class="badge badge-receita">Receita</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Deduções</span>] ) <span class="op">*</span> <span class="num">-1</span>
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dado de origem:</span> Coluna <span class="source-col">Deduções</span></p>
+                            <p>Deduções no ERP vêm como valor negativo. Multiplicamos por -1 para exibir como valor positivo nos gráficos waterfall (cascata). Inclui: impostos sobre venda, descontos financeiros, verbas e taxas de antecipação.</p>
+                        </div>
+                    </div>
+
+                    <!-- CUSTOS E DESPESAS -->
+                    <h3 class="formula-group-title">Custos e Despesas</h3>
+
+                    <div class="formula-card">
+                        <h4>Total CMV (Custo da Mercadoria Vendida) <span class="badge badge-custo">Custo</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">CMV</span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dado de origem:</span> Coluna <span class="source-col">CMV</span></p>
+                            <p>Custo direto da matéria-prima usada na produção dos gelatos. Vem diretamente do ERP. Quanto maior o CMV em relação à receita, menor a margem bruta.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Despesas Variáveis <span class="badge badge-custo">Custo</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Despesas Comerciais</span>] )<br>
+                            <span class="op">+</span> <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Despesas com Logística</span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dados de origem:</span> <span class="source-col">Despesas Comerciais</span> + <span class="source-col">Despesas com Logística</span></p>
+                            <p>Despesas que variam conforme o volume de vendas: marketing, comissões, frete e distribuição. Quando vende mais, essas despesas sobem proporcionalmente.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Total Despesas Fixas <span class="badge badge-custo">Custo</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Despesas com Manutenções</span>] )<br>
+                            <span class="op">+</span> <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Despesas Gerais e Adm</span>] )<br>
+                            <span class="op">+</span> <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Despesas com Pessoal</span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dados de origem:</span> <span class="source-col">Despesas com Manutenções</span> + <span class="source-col">Despesas Gerais e Adm</span> + <span class="source-col">Despesas com Pessoal</span></p>
+                            <p>Custos que existem independente do volume de vendas: manutenção de equipamentos e lojas, despesas administrativas (aluguel, contador, etc.) e toda a folha de pagamento com encargos.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Total Custos e Despesas Variáveis <span class="badge badge-custo">Custo</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            [<span class="col">Despesas Variáveis</span>]<br>
+                            <span class="op">+</span> [<span class="col">Total CMV</span>]<br>
+                            <span class="op">+</span> <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Impostos </span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dados de origem:</span> <span class="source-col">Despesas Comerciais</span> + <span class="source-col">Despesas com Logística</span> + <span class="source-col">CMV</span> + <span class="source-col">Impostos</span></p>
+                            <p>Soma de TODOS os custos variáveis: matéria-prima (CMV), impostos sobre vendas, despesas comerciais e logística. São os custos que acompanham o volume de vendas.</p>
+                        </div>
+                    </div>
+
+                    <!-- RESULTADOS -->
+                    <h3 class="formula-group-title">Resultados</h3>
+
+                    <div class="formula-card">
+                        <h4>Total Lucro Bruto <span class="badge badge-resultado">Resultado</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Lucro Bruto</span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dado de origem:</span> Coluna <span class="source-col">Lucro Bruto</span> (calculada no ERP como Receita Líquida − CMV)</p>
+                            <p>O lucro bruto já vem calculado do ERP. Representa quanto sobra após pagar a matéria-prima. É o primeiro nível de lucro e alimenta o cálculo da Margem Bruta.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>EBITDA <span class="badge badge-resultado">Resultado</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Lucro Bruto</span>] )<br>
+                            <span class="op">−</span> <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Despesas Operacionais</span>] )<br>
+                            <span class="op">−</span> <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Outras receitas/despesas</span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dados de origem:</span> <span class="source-col">Lucro Bruto</span> − <span class="source-col">Despesas Operacionais</span> − <span class="source-col">Outras receitas/despesas</span></p>
+                            <p>Lucro operacional antes de juros, impostos, depreciação e amortização. Pega o Lucro Bruto e subtrai as despesas operacionais e itens não-recorrentes. Mostra se a <strong>operação central</strong> do negócio é rentável.</p>
+                            <p><strong>Ponto de atenção para validação:</strong> Confirme no ERP que a coluna "Despesas Operacionais" inclui exatamente o que esperamos (Pessoal + Manutenções + G&A + Comerciais + Logística) e que "Outras receitas/despesas" são itens realmente não-recorrentes.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Total Lucro Líquido <span class="badge badge-resultado">Resultado</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Lucro Líquido</span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dado de origem:</span> Coluna <span class="source-col">Lucro Líquido</span> (calculada no ERP)</p>
+                            <p>Resultado final após TODOS os custos, impostos e despesas financeiras. Vem direto do ERP. É o valor que aparece no balanço e pode ser distribuído como dividendo.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Total FCLA (Fluxo de Caixa Livre para Acionista) <span class="badge badge-resultado">Resultado</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">FCLA</span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Dado de origem:</span> Coluna <span class="source-col">FCLA</span> (calculada no ERP)</p>
+                            <p>O FCLA já vem do ERP e representa o dinheiro real disponível para o acionista após todos os pagamentos operacionais, investimentos (CapEx), amortizações de dívida e passivos tributários.</p>
+                            <p><strong>Ponto de atenção:</strong> O FCLA é o indicador mais importante do ponto de vista do sócio. Um FCLA negativo (como em Mai, Set, Out/25) significa que mesmo gerando lucro contábil, a empresa consumiu mais caixa do que gerou — provavelmente por investimentos ou pagamentos de dívida.</p>
+                        </div>
+                    </div>
+
+                    <!-- MARGENS -->
+                    <h3 class="formula-group-title">Margens e Indicadores Percentuais</h3>
+
+                    <div class="formula-card">
+                        <h4>% Margem Bruta <span class="badge badge-margem">Margem</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">DIVIDE</span>(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Lucro Bruto</span>] ),<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[<span class="col">Total Rec Lic</span>] <span class="comment">&nbsp;&nbsp;← Receita Líquida</span><br>
+                            )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Cálculo:</span> Lucro Bruto ÷ Receita Líquida</p>
+                            <p>De cada R$ 1,00 de receita líquida, quanto sobra após pagar a matéria-prima. Exemplo: se a margem é 60%, para cada R$ 100 que entra, R$ 60 sobram depois do CMV.</p>
+                            <p><strong>Referência food service:</strong> Saudável acima de 55%.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>% Margem de Contribuição <span class="badge badge-margem">Margem</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">DIVIDE</span>(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[<span class="col">Total Rec Lic</span>]<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="op">−</span> [<span class="col">Total CMV</span>]<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="op">−</span> <span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Impostos </span>] )<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="op">−</span> [<span class="col">Despesas Variáveis</span>],<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[<span class="col">Total Rec Lic</span>]<br>
+                            )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Cálculo:</span> (Receita Líquida − CMV − Impostos − Despesas Variáveis) ÷ Receita Líquida</p>
+                            <p><span class="source-label">Dados usados:</span> <span class="source-col">Receita Líquida</span> <span class="source-col">CMV</span> <span class="source-col">Impostos</span> <span class="source-col">Despesas Comerciais</span> <span class="source-col">Despesas com Logística</span></p>
+                            <p>Quanto de cada venda sobra para cobrir os custos fixos e gerar lucro, após todos os custos variáveis. É a margem mais completa antes das despesas fixas.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>% Margem Operacional <span class="badge badge-margem">Margem</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">DIVIDE</span>( [<span class="col">EBITDA</span>], [<span class="col">Total Rec Lic</span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Cálculo:</span> EBITDA ÷ Receita Líquida</p>
+                            <p>Quanto da receita líquida vira resultado operacional. Se a margem operacional é 25%, significa que a cada R$ 100 de receita líquida, R$ 25 viram EBITDA.</p>
+                            <p><strong>Referência food service:</strong> Saudável acima de 20%.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>% Margem Líquida <span class="badge badge-margem">Margem</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">DIVIDE</span>(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Lucro Líquido</span>] ),<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Receita Bruta</span>] ) <span class="comment">&nbsp;&nbsp;← atenção: usa Receita BRUTA</span><br>
+                            )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Cálculo:</span> Lucro Líquido ÷ Receita <strong>Bruta</strong></p>
+                            <p><strong>Ponto de atenção para validação:</strong> Esta medida divide o Lucro Líquido pela Receita <strong>Bruta</strong> (e não pela Líquida como as outras margens). Isso é intencional — dá uma visão mais conservadora da margem final, considerando o faturamento total. Compare este critério com o que usa no seu relatório financeiro para confirmar se está de acordo.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>% Peso CMV <span class="badge badge-margem">Margem</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">DIVIDE</span>( [<span class="col">Total CMV</span>], [<span class="col">Total Rec Lic</span>] )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Cálculo:</span> CMV ÷ Receita Líquida</p>
+                            <p>Quanto de cada real de receita líquida é consumido pela matéria-prima. Quanto menor, melhor. Se está em 40%, cada R$ 100 de receita líquida gasta R$ 40 com ingredientes.</p>
+                            <p><strong>Referência:</strong> Saudável abaixo de 40%. Em Mai e Set/25, chegou a 47% e 52%.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>% Peso da Folha <span class="badge badge-margem">Margem</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">DIVIDE</span>(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Despesas com Pessoal</span>] ),<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SUM</span>( <span class="tbl">'Base Comercial'</span>[<span class="col">Receita Bruta</span>] ) <span class="comment">&nbsp;&nbsp;← atenção: usa Receita BRUTA</span><br>
+                            )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Cálculo:</span> Despesas com Pessoal ÷ Receita <strong>Bruta</strong></p>
+                            <p><span class="source-label">Dados usados:</span> <span class="source-col">Despesas com Pessoal</span> <span class="source-col">Receita Bruta</span></p>
+                            <p>Quanto do faturamento é destinado a salários, encargos e benefícios. Essa também usa Receita Bruta como denominador (assim como a Margem Líquida).</p>
+                            <p><strong>Referência:</strong> Saudável abaixo de 25% para food service.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>% EBITDA <span class="badge badge-margem">Margem</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            [<span class="col">EBITDA</span>] <span class="op">/</span> [<span class="col">Total Rec Lic</span>]
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Cálculo:</span> EBITDA ÷ Receita Líquida</p>
+                            <p>Idêntica à Margem Operacional. Mede a eficiência operacional — quanto da receita líquida se transforma em resultado antes de juros, impostos, depreciação e amortização.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>% FCLA <span class="badge badge-margem">Margem</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            [<span class="col">Total FCLA</span>] <span class="op">/</span> [<span class="col">Total Rec Lic</span>]
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Cálculo:</span> FCLA ÷ Receita Líquida</p>
+                            <p>Quanto da receita líquida se transforma em caixa disponível para o acionista. É o indicador final de eficiência financeira.</p>
+                            <p><strong>Referência:</strong> Saudável acima de 5%.</p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Cash Conversion (Conversão de Caixa) <span class="badge badge-margem">Margem</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            [<span class="col">Total FCLA</span>] <span class="op">/</span> [<span class="col">EBITDA</span>]
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Cálculo:</span> FCLA ÷ EBITDA</p>
+                            <p>De todo o EBITDA gerado, quanto virou caixa de verdade. Se o EBITDA é R$ 100 e o FCLA é R$ 60, a conversão é 60% — ou seja, 40% do resultado operacional foi "consumido" por investimentos, dívidas ou passivos tributários.</p>
+                            <p><strong>Referência:</strong> Saudável acima de 50%. Abaixo disso indica que investimentos ou dívidas estão consumindo o resultado.</p>
+                        </div>
+                    </div>
+
+                    <!-- INDICADORES AVANÇADOS -->
+                    <h3 class="formula-group-title">Indicadores Avançados</h3>
+
+                    <div class="formula-card">
+                        <h4>Break-Even Point (Ponto de Equilíbrio) <span class="badge badge-avancado">Avançado</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">DIVIDE</span>(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[<span class="col">Total Despesas Fixas</span>],<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[<span class="col">% Margem Bruta</span>]<br>
+                            )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Cálculo:</span> Despesas Fixas ÷ % Margem Bruta</p>
+                            <p>Receita mínima necessária para cobrir todos os custos fixos. Se as despesas fixas somam R$ 500.000/mês e a margem bruta é 60%, o break-even é R$ 833.333. Abaixo disso a empresa opera no prejuízo.</p>
+                            <p><strong>Componentes das Despesas Fixas usadas:</strong> <span class="source-col">Despesas com Manutenções</span> + <span class="source-col">Despesas Gerais e Adm</span> + <span class="source-col">Despesas com Pessoal</span></p>
+                        </div>
+                    </div>
+
+                    <div class="formula-card">
+                        <h4>Crescimento MoM (Mês a Mês) <span class="badge badge-avancado">Avançado</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">DIVIDE</span>(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[<span class="col">Receita Líquida Atual</span>] <span class="op">−</span> [<span class="col">Receita Liq Mês Anterior</span>],<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;[<span class="col">Receita Liq Mês Anterior</span>]<br>
+                            )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Cálculo:</span> (Receita Atual − Receita Mês Anterior) ÷ Receita Mês Anterior</p>
+                            <p>Percentual de crescimento ou queda da receita líquida em relação ao mês anterior. Positivo = cresceu, Negativo = caiu. Exemplo: se foi de R$ 2,8M para R$ 3,0M, o crescimento MoM é +7,1%.</p>
+                        </div>
+                    </div>
+
+                    <!-- FUNIL FINANCEIRO -->
+                    <h3 class="formula-group-title">Funil Financeiro (Página 2)</h3>
+
+                    <div class="formula-card">
+                        <h4>Valor do Funil <span class="badge badge-avancado">Avançado</span></h4>
+                        <div class="formula-box">
+                            <span class="formula-label">DAX</span>
+                            <span class="fn">SWITCH</span>(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">SELECTEDVALUE</span>( <span class="tbl">'dFunilFinanceiro'</span>[<span class="col">Ordem</span>] ),<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="num">1</span>, [<span class="col">Total Rec Lic</span>], &nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">← Receita Líquida</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="num">2</span>, [<span class="col">Total Lucro Bruto</span>], <span class="comment">← Lucro Bruto</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="num">3</span>, [<span class="col">EBITDA</span>], &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">← EBITDA</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="num">4</span>, [<span class="col">Total Lucro Líquido</span>], <span class="comment">← Lucro Líquido</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="num">5</span>, [<span class="col">Total FCLA</span>], &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="comment">← FCLA</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">BLANK</span>()<br>
+                            )
+                        </div>
+                        <div class="formula-explain">
+                            <p><span class="source-label">Como funciona:</span> Esta medida alimenta o gráfico de funil. Dependendo de qual etapa está selecionada (1 a 5), retorna a medida correspondente:</p>
+                            <p>
+                                <strong>Etapa 1 →</strong> Receita Líquida (todo o dinheiro que entra)<br>
+                                <strong>Etapa 2 →</strong> Lucro Bruto (após pagar matéria-prima)<br>
+                                <strong>Etapa 3 →</strong> EBITDA (após custos operacionais)<br>
+                                <strong>Etapa 4 →</strong> Lucro Líquido (após impostos e financeiro)<br>
+                                <strong>Etapa 5 →</strong> FCLA (dinheiro real no bolso do sócio)
+                            </p>
+                            <p>A tabela <span class="source-col">dFunilFinanceiro</span> contém apenas 5 linhas com as etapas ordenadas. Essa estrutura permite que o Power BI renderize o funil com as barras diminuindo de tamanho.</p>
+                        </div>
+                    </div>
+
+                    <div class="validation-note" style="margin-top: 30px;">
+                        <strong>Resumo para validação rápida:</strong> Todas as medidas de valor absoluto (Receita, CMV, Lucro, FCLA) são somas diretas de colunas do ERP — o Power BI não inventa dados, apenas soma. As margens são divisões entre essas somas. Os pontos a validar são: (1) se os dados que chegam do ERP estão corretos e completos, (2) se o critério de cada coluna no ERP corresponde ao que esperamos (ex: CMV realmente contém só matéria-prima?), e (3) se os denominadores das margens (Receita Bruta vs Líquida) estão de acordo com o padrão que vocês usam internamente.
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Section 7: Como Analisar -->
+            <section id="analise-mensal">
+                <div class="content">
+                    <h2>Como Analisar — Roteiro Mensal</h2>
+
+                    <p>Siga este roteiro toda vez que quiser analisar o desempenho do mês no dashboard. Leva aproximadamente <strong>15 minutos</strong> e você terá uma visão completa do negócio.</p>
+
+                    <div class="step-list">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Abra o Painel Geral e verifique os KPIs do mês</h4>
+                                <p>Veja os Cards de KPI no topo: Receita Bruta, Receita Líquida e Variação MoM. Esses números dão um overview imediato de como foi o mês. Se a receita bruta caiu, saiba que começa aí o problema.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Compare com o mês anterior (variação MoM nos cards)</h4>
+                                <p>O card de variação MoM mostra se você cresceu ou caiu comparado ao mês anterior. Crescimento de +5% é bom? Depende da sazonalidade. Queda de -10% é problema? Talvez — precisa investigar se é sazonal ou operacional.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Use o Seletor de Margem para percorrer cada margem</h4>
+                                <p>Clique no seletor de margem e veja: % Margem Bruta, % Margem Operacional, % Margem Líquida. Estão dentro dos padrões saudáveis (55%, 20%, 8% respectivamente)? Se caíram, há um problema no produto/preço ou custos aumentaram.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h4>Identifique vilões de custo</h4>
+                                <p>Olhe para "% Peso CMV" e "% Peso da Folha". CMV > 40% significa fornecedores caros, desperdício ou mix ruim. Folha > 25% significa quadro acima do ideal. Se ambos estão altos, seu EBITDA e lucro caem. Qual está pior?</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">5</div>
+                            <div class="step-content">
+                                <h4>Vá ao Funil Financeiro para ver onde o dinheiro está saindo</h4>
+                                <p>Abra a página "Funil Financeiro". Você vê a receita líquida encolhendo até o FCLA. Se o FCLA é muito menor que o lucro líquido, há investimentos pesados ou amortização de dívidas. Identifique a causa.</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">6</div>
+                            <div class="step-content">
+                                <h4>Avalie o FCLA — o resultado final que importa</h4>
+                                <p>FCLA é o dinheiro que realmente importa. Se é positivo e saudável, o negócio está funcionando. Se é negativo, precisa rever investimentos e dívidas. Se caiu mês a mês, investigar raiz do problema.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3>Checklist Rápido para Reunião</h3>
+                    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <ul style="list-style: none; margin: 0;">
+                            <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                                <input type="checkbox"> Receita Bruta e Receita Líquida estão crescendo MoM?
+                            </li>
+                            <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                                <input type="checkbox"> Margem Bruta está > 55%?
+                            </li>
+                            <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                                <input type="checkbox"> EBITDA está > 20% da receita?
+                            </li>
+                            <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                                <input type="checkbox"> % Peso CMV está < 40%?
+                            </li>
+                            <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                                <input type="checkbox"> % Peso da Folha está < 25%?
+                            </li>
+                            <li style="padding: 10px 0; border-bottom: 1px solid #eee;">
+                                <input type="checkbox"> Lucro Líquido está > 8% da receita?
+                            </li>
+                            <li style="padding: 10px 0;">
+                                <input type="checkbox"> FCLA é positivo?
+                            </li>
+                        </ul>
+                    </div>
+
+                    <p style="margin-top: 20px; padding: 15px; background: #e0f2f1; border-radius: 5px; border-left: 4px solid #0d9488;">
+                        <strong>Dica:</strong> Se todos os checkboxes estão marcados, seu negócio está muito bem. Se 1-2 não estão, identifique qual e faça um plano de ação. Se 3+ não estão, há algo sério que precisa ser revisado com a equipe operacional.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Section 7: Alertas -->
+            <section id="alertas">
+                <div class="content">
+                    <h2>Alertas e Sinais de Atenção</h2>
+
+                    <p>Aqui estão os principais cenários problemáticos que você pode encontrar no dashboard. Se ver algo assim, saiba que é hora de investigar.</p>
+
+                    <div class="alert-card danger">
+                        <span class="alert-icon">⚠️</span>
+                        <div class="alert-content">
+                            <h4>Margem Bruta caindo (< 55%)</h4>
+                            <p><strong>Problema:</strong> Você está perdendo dinheiro no produto básico. Pode ser por aumento de CMV, redução de preços ou mix de vendas pior.</p>
+                            <p><strong>Ação:</strong> Revise fornecedores, preços praticados e proporção de produtos vendidos. Se continuador caindo, precisa reposicionar menu ou aumentar preços.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-card danger">
+                        <span class="alert-icon">⚠️</span>
+                        <div class="alert-content">
+                            <h4>% Peso CMV subindo (> 40%)</h4>
+                            <p><strong>Problema:</strong> Matéria-prima está consumindo muito da receita. Pode ser fornecedores mais caros, desperdício, ou volumes menores (custo fixo diluído em menos vendas).</p>
+                            <p><strong>Ação:</strong> Analise custo de fornecimento, busque novos fornecedores, reduza desperdício. Se problema é volume, foco em marketing/vendas.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-card danger">
+                        <span class="alert-icon">🚨</span>
+                        <div class="alert-content">
+                            <h4>FCLA negativo (enquanto Lucro Líquido é positivo)</h4>
+                            <p><strong>Problema:</strong> Você tem lucro no papel, mas sem caixa. Significa investimentos pesados, amortização de dívidas ou pagamentos pontuais consumindo o dinheiro.</p>
+                            <p><strong>Ação:</strong> Revise cronograma de investimentos e dívidas. Talvez precise de capital de giro ou precisar estender prazos de pagamento a fornecedores.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-card warning">
+                        <span class="alert-icon">⚡</span>
+                        <div class="alert-content">
+                            <h4>Cash Conversion < 50%</h4>
+                            <p><strong>Problema:</strong> Seu EBITDA (lucro operacional) não está virando caixa. Menos da metade do lucro operacional vira dinheiro livre.</p>
+                            <p><strong>Ação:</strong> Revise investimentos de capital, contas a receber (CPF/CNPJ demorando), condições de pagamento a fornecedores.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-card warning">
+                        <span class="alert-icon">⚡</span>
+                        <div class="alert-content">
+                            <h4>% Peso da Folha > 25%</h4>
+                            <p><strong>Problema:</strong> Folha de pagamento acima do ideal para food service. Pode ser quadro inchado, salários altos, ou falta de eficiência em headcount.</p>
+                            <p><strong>Ação:</strong> Revise quadro de pessoal, produtividade por funcionário, e se há oportunidade de automação ou terceirização.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-card info">
+                        <span class="alert-icon">ℹ️</span>
+                        <div class="alert-content">
+                            <h4>Receita caindo MoM (por 2+ meses)</h4>
+                            <p><strong>Problema:</strong> Queda de receita continuada pode indicar perda de clientes, sazonalidade ruim ou produto menos atrativo.</p>
+                            <p><strong>Ação:</strong> Investigue causa (sazonalidade vs. operacional). Se operacional, ative plano de marketing ou revise product-market fit.</p>
+                        </div>
+                    </div>
+
+                    <h3>Matriz de Risco: Quando Preocupar</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Indicador</th>
+                                    <th>Verde (OK)</th>
+                                    <th>Amarelo (Atenção)</th>
+                                    <th>Vermelho (Crítico)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>% Margem Bruta</strong></td>
+                                    <td class="num">> 55%</td>
+                                    <td class="num">45-55%</td>
+                                    <td class="num">< 45%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>% Margem Operacional</strong></td>
+                                    <td class="num">> 20%</td>
+                                    <td class="num">15-20%</td>
+                                    <td class="num">< 15%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>% Margem Líquida</strong></td>
+                                    <td class="num">> 8%</td>
+                                    <td class="num">5-8%</td>
+                                    <td class="num">< 5%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>% Peso CMV</strong></td>
+                                    <td class="num">< 40%</td>
+                                    <td class="num">40-50%</td>
+                                    <td class="num">> 50%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>% Peso Folha</strong></td>
+                                    <td class="num">< 25%</td>
+                                    <td class="num">25-30%</td>
+                                    <td class="num">> 30%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Cash Conversion</strong></td>
+                                    <td class="num">> 50%</td>
+                                    <td class="num">30-50%</td>
+                                    <td class="num">< 30%</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>FCLA</strong></td>
+                                    <td class="num">> 0</td>
+                                    <td class="num">Estável</td>
+                                    <td class="num">< 0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 8: Dados Reais 2025 -->
+            <section id="dados-2025">
+                <div class="content">
+                    <h2>Dados Reais 2025</h2>
+
+                    <p>Aqui estão todos os dados mensais da Freddo Gelateria em 2025. Esses são os números que alimentam o dashboard "Acompanhamento Financeiro".</p>
+
+                    <h3>Tabela de Dados Mensais</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mês</th>
+                                    <th>Receita Bruta</th>
+                                    <th>Receita Líquida</th>
+                                    <th>CMV</th>
+                                    <th>Lucro Bruto</th>
+                                    <th>EBITDA</th>
+                                    <th>Lucro Líquido</th>
+                                    <th>FCLA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Jan/25</strong></td>
+                                    <td class="num">3.585.651</td>
+                                    <td class="num">2.760.951</td>
+                                    <td class="num">855.895</td>
+                                    <td class="num">1.905.056</td>
+                                    <td class="num">959.861</td>
+                                    <td class="num">424.418</td>
+                                    <td class="num">203.940</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Fev/25</strong></td>
+                                    <td class="num">3.919.842</td>
+                                    <td class="num">3.018.278</td>
+                                    <td class="num">1.267.677</td>
+                                    <td class="num">1.750.601</td>
+                                    <td class="num">763.955</td>
+                                    <td class="num">292.126</td>
+                                    <td class="num">59.154</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mar/25</strong></td>
+                                    <td class="num">3.684.144</td>
+                                    <td class="num">2.836.791</td>
+                                    <td class="num">964.509</td>
+                                    <td class="num">1.872.282</td>
+                                    <td class="num">914.786</td>
+                                    <td class="num">390.891</td>
+                                    <td class="num">178.082</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Abr/25</strong></td>
+                                    <td class="num">3.434.004</td>
+                                    <td class="num">2.644.183</td>
+                                    <td class="num">951.906</td>
+                                    <td class="num">1.692.277</td>
+                                    <td class="num">765.887</td>
+                                    <td class="num">295.789</td>
+                                    <td class="num">92.115</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mai/25</strong></td>
+                                    <td class="num">3.876.415</td>
+                                    <td class="num">2.984.840</td>
+                                    <td class="num">1.402.875</td>
+                                    <td class="num">1.581.965</td>
+                                    <td class="num">600.637</td>
+                                    <td class="num">182.841</td>
+                                    <td class="num">-67.646</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Jun/25</strong></td>
+                                    <td class="num">3.822.436</td>
+                                    <td class="num">2.943.276</td>
+                                    <td class="num">1.147.878</td>
+                                    <td class="num">1.795.398</td>
+                                    <td class="num">820.776</td>
+                                    <td class="num">327.318</td>
+                                    <td class="num">91.053</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Jul/25</strong></td>
+                                    <td class="num">3.593.301</td>
+                                    <td class="num">2.766.842</td>
+                                    <td class="num">1.023.731</td>
+                                    <td class="num">1.743.110</td>
+                                    <td class="num">796.906</td>
+                                    <td class="num">317.793</td>
+                                    <td class="num">90.818</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Ago/25</strong></td>
+                                    <td class="num">3.744.311</td>
+                                    <td class="num">2.883.119</td>
+                                    <td class="num">1.037.923</td>
+                                    <td class="num">1.845.196</td>
+                                    <td class="num">880.241</td>
+                                    <td class="num">367.482</td>
+                                    <td class="num">160.621</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Set/25</strong></td>
+                                    <td class="num">3.884.392</td>
+                                    <td class="num">2.990.982</td>
+                                    <td class="num">1.555.311</td>
+                                    <td class="num">1.435.671</td>
+                                    <td class="num">453.398</td>
+                                    <td class="num">84.213</td>
+                                    <td class="num">-143.737</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Out/25</strong></td>
+                                    <td class="num">3.450.864</td>
+                                    <td class="num">2.657.165</td>
+                                    <td class="num">1.275.439</td>
+                                    <td class="num">1.381.726</td>
+                                    <td class="num">453.288</td>
+                                    <td class="num">91.852</td>
+                                    <td class="num">-137.775</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Nov/25</strong></td>
+                                    <td class="num">3.441.650</td>
+                                    <td class="num">2.650.071</td>
+                                    <td class="num">1.086.529</td>
+                                    <td class="num">1.563.542</td>
+                                    <td class="num">636.281</td>
+                                    <td class="num">214.182</td>
+                                    <td class="num">2.290</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Dez/25</strong></td>
+                                    <td class="num">3.647.172</td>
+                                    <td class="num">2.808.322</td>
+                                    <td class="num">1.207.579</td>
+                                    <td class="num">1.600.744</td>
+                                    <td class="num">647.889</td>
+                                    <td class="num">220.150</td>
+                                    <td class="num">-7.457</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Gráfico: Receita Bruta vs Receita Líquida</h3>
+                    <p>Veja como a receita bruta e líquida evoluem ao longo do ano:</p>
+                    <div class="chart-container large">
+                        <canvas id="chart-receita-anual"></canvas>
+                    </div>
+
+                    <h3>Gráfico: Evolução de Margens ao Longo do Ano</h3>
+                    <p>Acompanhe como as margens variaram mês a mês em 2025:</p>
+                    <div class="chart-container large">
+                        <canvas id="chart-margens"></canvas>
+                    </div>
+
+                    <h3>Análise do Ano 2025</h3>
+                    <div class="card-grid">
+                        <div class="card">
+                            <h4>Receita Bruta Total</h4>
+                            <p>Faturamento acumulado de janeiro a dezembro.</p>
+                            <div class="card-value">R$ 45.483.041</div>
+                        </div>
+                        <div class="card">
+                            <h4>Receita Líquida Total</h4>
+                            <p>Receita disponível após deduções e impostos.</p>
+                            <div class="card-value">R$ 34.900.525</div>
+                        </div>
+                        <div class="card">
+                            <h4>Lucro Bruto Total</h4>
+                            <p>Ganho antes de custos operacionais.</p>
+                            <div class="card-value">R$ 19.923.233</div>
+                        </div>
+                        <div class="card">
+                            <h4>EBITDA Total</h4>
+                            <p>Resultado operacional (margem média: 24%).</p>
+                            <div class="card-value">R$ 8.531.126</div>
+                        </div>
+                        <div class="card">
+                            <h4>Lucro Líquido Total</h4>
+                            <p>Lucro final após todos os custos (9% de margem).</p>
+                            <div class="card-value">R$ 3.203.484</div>
+                        </div>
+                        <div class="card">
+                            <h4>FCLA Total</h4>
+                            <p>Caixa disponível para acionista (1.4% de margem).</p>
+                            <div class="card-value">R$ 499.270</div>
+                        </div>
+                    </div>
+
+                    <h3>Observações Sobre 2025</h3>
+                    <ul style="margin-left: 20px; margin-bottom: 15px;">
+                        <li><strong>Meses críticos:</strong> Maio, Setembro e Outubro tiveram FCLA negativo. Indicativo de picos de investimento ou ajustes de caixa nessas épocas.</li>
+                        <li><strong>Variação de Receita:</strong> A receita bruta oscilou entre R$ 3,4M (Abril) e R$ 3,9M (Fevereiro). Variação normal para food service com sazonalidade.</li>
+                        <li><strong>Margens:</strong> Margem bruta média de 57% é excelente (acima do benchmark de 55%). CMV médio foi 39% — muito controlado.</li>
+                        <li><strong>Peso da Folha:</strong> Média de 16.6% é muito saudável para o segmento. Indica quadro enxuto e bem dimensionado.</li>
+                        <li><strong>EBITDA:</strong> Média de 24% de margem mostra operação eficiente. Empresa é lucrativa mesmo sem considerar impostos e juros.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>Preparado por Heros | Dados: ERP Freddo Gelateria | 2025</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const DATA = [
+            {mes:"Jan/25",ano:2025,mesNum:1,recBruta:3585651,recLiq:2760951.27,cmv:855894.89,lucroBruto:1905056.38,ebitda:959860.79,lucroLiq:424417.67,fcla:203939.67,margBruta:0.69,margOper:0.3477,margLiq:0.1184,pesoCMV:0.31,pesoFolha:0.1694},
+            {mes:"Fev/25",ano:2025,mesNum:2,recBruta:3919842,recLiq:3018278.34,cmv:1267676.90,lucroBruto:1750601.44,ebitda:763955.44,lucroLiq:292126.09,fcla:59153.69,margBruta:0.58,margOper:0.2531,margLiq:0.0745,pesoCMV:0.42,pesoFolha:0.1575},
+            {mes:"Mar/25",ano:2025,mesNum:3,recBruta:3684144,recLiq:2836790.88,cmv:964508.90,lucroBruto:1872281.98,ebitda:914785.88,lucroLiq:390891.13,fcla:178081.71,margBruta:0.66,margOper:0.3225,margLiq:0.1061,pesoCMV:0.34,pesoFolha:0.1657},
+            {mes:"Abr/25",ano:2025,mesNum:4,recBruta:3434004,recLiq:2644183.08,cmv:951905.91,lucroBruto:1692277.17,ebitda:765886.84,lucroLiq:295788.75,fcla:92115.26,margBruta:0.64,margOper:0.2896,margLiq:0.0861,pesoCMV:0.36,pesoFolha:0.1756},
+            {mes:"Mai/25",ano:2025,mesNum:5,recBruta:3876415,recLiq:2984839.55,cmv:1402874.59,lucroBruto:1581964.96,ebitda:600636.74,lucroLiq:182840.64,fcla:-67645.83,margBruta:0.53,margOper:0.2012,margLiq:0.0472,pesoCMV:0.47,pesoFolha:0.1589},
+            {mes:"Jun/25",ano:2025,mesNum:6,recBruta:3822436,recLiq:2943275.72,cmv:1147877.53,lucroBruto:1795398.19,ebitda:820775.63,lucroLiq:327317.61,fcla:91052.80,margBruta:0.61,margOper:0.2789,margLiq:0.0856,pesoCMV:0.39,pesoFolha:0.1608},
+            {mes:"Jul/25",ano:2025,mesNum:7,recBruta:3593301,recLiq:2766841.77,cmv:1023731.45,lucroBruto:1743110.32,ebitda:796905.52,lucroLiq:317793.37,fcla:90817.92,margBruta:0.63,margOper:0.2880,margLiq:0.0884,pesoCMV:0.37,pesoFolha:0.1691},
+            {mes:"Ago/25",ano:2025,mesNum:8,recBruta:3744311,recLiq:2883119.47,cmv:1037923.01,lucroBruto:1845196.46,ebitda:880241.26,lucroLiq:367481.84,fcla:160621.32,margBruta:0.64,margOper:0.3053,margLiq:0.0981,pesoCMV:0.36,pesoFolha:0.1635},
+            {mes:"Set/25",ano:2025,mesNum:9,recBruta:3884392,recLiq:2990981.84,cmv:1555310.56,lucroBruto:1435671.28,ebitda:453398.53,lucroLiq:84213.02,fcla:-143737.00,margBruta:0.48,margOper:0.1516,margLiq:0.0217,pesoCMV:0.52,pesoFolha:0.1587},
+            {mes:"Out/25",ano:2025,mesNum:10,recBruta:3450864,recLiq:2657165.28,cmv:1275439.33,lucroBruto:1381725.95,ebitda:453287.69,lucroLiq:91852.29,fcla:-137775.18,margBruta:0.52,margOper:0.1706,margLiq:0.0266,pesoCMV:0.48,pesoFolha:0.1748},
+            {mes:"Nov/25",ano:2025,mesNum:11,recBruta:3441650,recLiq:2650070.50,cmv:1086528.91,lucroBruto:1563541.60,ebitda:636281.40,lucroLiq:214182.34,fcla:2290.49,margBruta:0.59,margOper:0.2401,margLiq:0.0622,pesoCMV:0.41,pesoFolha:0.1752},
+            {mes:"Dez/25",ano:2025,mesNum:12,recBruta:3647172,recLiq:2808322.44,cmv:1207578.65,lucroBruto:1600743.79,ebitda:647889.20,lucroLiq:220149.67,fcla:-7457.32,margBruta:0.57,margOper:0.2307,margLiq:0.0604,pesoCMV:0.43,pesoFolha:0.1671}
+        ];
+
+        // Navigation
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                const targetId = link.getAttribute('href').substring(1);
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(targetId).classList.add('active');
+
+                window.scrollTo(0, 0);
+            });
+        });
+
+        // Chart 1: Receita Líquida Mensal
+        const ctx1 = document.getElementById('chart-receita-mensal').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: DATA.map(d => d.mes),
+                datasets: [{
+                    label: 'Receita Líquida (R$)',
+                    data: DATA.map(d => d.recLiq),
+                    borderColor: '#0d9488',
+                    backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#0d9488',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        padding: 12,
+                        titleFont: { size: 14 },
+                        bodyFont: { size: 13 },
+                        callbacks: {
+                            label: (context) => `R$ ${context.parsed.y.toLocaleString('pt-BR', {maximumFractionDigits: 0})}`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            callback: (value) => `R$ ${(value/1000000).toFixed(1)}M`
+                        }
+                    }
+                }
+            }
+        });
+
+        // Chart 2: Funil Financeiro
+        const ctx2 = document.getElementById('chart-funil').getContext('2d');
+        const funnelData = [
+            { label: 'Receita Líquida', value: 34900525 },
+            { label: 'Lucro Bruto', value: 19923233 },
+            { label: 'EBITDA', value: 8531126 },
+            { label: 'Lucro Líquido', value: 3203484 },
+            { label: 'FCLA', value: 499270 }
+        ];
+
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: funnelData.map(d => d.label),
+                datasets: [{
+                    label: 'Valor (R$)',
+                    data: funnelData.map(d => d.value),
+                    backgroundColor: [
+                        '#0d9488',
+                        '#0891b2',
+                        '#06b6d4',
+                        '#8b5cf6',
+                        '#ec4899'
+                    ],
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `R$ ${context.parsed.x.toLocaleString('pt-BR', {maximumFractionDigits: 0})}`
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: (value) => `R$ ${(value/1000000).toFixed(0)}M`
+                        }
+                    }
+                }
+            }
+        });
+
+        // Chart 3: Receita Bruta vs Líquida Anual
+        const ctx3 = document.getElementById('chart-receita-anual').getContext('2d');
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: DATA.map(d => d.mes),
+                datasets: [
+                    {
+                        label: 'Receita Bruta',
+                        data: DATA.map(d => d.recBruta),
+                        backgroundColor: '#0891b2',
+                        borderRadius: 5,
+                    },
+                    {
+                        label: 'Receita Líquida',
+                        data: DATA.map(d => d.recLiq),
+                        backgroundColor: '#0d9488',
+                        borderRadius: 5,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `R$ ${context.parsed.y.toLocaleString('pt-BR', {maximumFractionDigits: 0})}`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => `R$ ${(value/1000000).toFixed(1)}M`
+                        }
+                    }
+                }
+            }
+        });
+
+        // Chart 4: Evolução de Margens
+        const ctx4 = document.getElementById('chart-margens').getContext('2d');
+        new Chart(ctx4, {
+            type: 'line',
+            data: {
+                labels: DATA.map(d => d.mes),
+                datasets: [
+                    {
+                        label: '% Margem Bruta',
+                        data: DATA.map(d => (d.margBruta * 100).toFixed(0)),
+                        borderColor: '#0d9488',
+                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                    },
+                    {
+                        label: '% Margem Operacional',
+                        data: DATA.map(d => (d.margOper * 100).toFixed(0)),
+                        borderColor: '#0891b2',
+                        backgroundColor: 'rgba(8, 145, 178, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                    },
+                    {
+                        label: '% Margem Líquida',
+                        data: DATA.map(d => (d.margLiq * 100).toFixed(0)),
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => `${context.parsed.y}%`
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => `${value}%`
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
